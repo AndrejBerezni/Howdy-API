@@ -39,24 +39,18 @@ const UserSchema = new mongoose.Schema({
       "Password must contain at least one number, one special character, and have the length of at least 8 characters",
     ],
   },
-  friends: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: User,
-    },
-  ],
-  chats: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: Chat,
-    },
-  ],
-  friendRequests: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: FriendRequest,
-    },
-  ],
+  friends: {
+    type: [mongoose.Schema.Types.ObjectId],
+    default: [],
+  },
+  chats: {
+    type: [mongoose.Schema.Types.ObjectId],
+    default: [],
+  },
+  friendRequests: {
+    type: [mongoose.Schema.Types.ObjectId],
+    default: [],
+  },
 });
 
 UserSchema.pre("save", async function (next) {
