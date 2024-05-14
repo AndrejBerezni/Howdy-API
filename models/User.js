@@ -5,20 +5,20 @@ const UserSchema = new mongoose.Schema({
   firstName: {
     type: String,
     required: [true, "Please provide first name"],
-    minlength: 2,
-    maxlength: 50,
+    minlength: [2, "First name must be longer than 2 characters"],
+    maxlength: [50, "First name can not be longer than 50 characters"],
   },
   lastName: {
     type: String,
     required: [true, "Please provide last name"],
-    minlength: 2,
-    maxlength: 50,
+    minlength: [2, "Last name must be longer than 2 characters"],
+    maxlength: [50, "Last name can not be longer than 50 characters"],
   },
   nickname: {
     type: String,
     required: [true, "Please provide nickname"],
-    minlength: 5,
-    maxlength: 32,
+    minlength: [5, "Nickname must be longer than 5 characters"],
+    maxlength: [32, "Nickname can not be longer than 32 characters"],
     unique: [true, "Nickname already exists, please choose another one"],
   },
   email: {
@@ -33,7 +33,10 @@ const UserSchema = new mongoose.Schema({
   password: {
     type: String,
     required: [true, "Please provide password"],
-    minlength: 8,
+    minlength: [
+      8,
+      "Password must contain at least one number, one special character, and have the length of at least 8 characters",
+    ],
     match: [
       /^.*(?=.{8,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!#$%&? "]).*$/,
       "Password must contain at least one number, one special character, and have the length of at least 8 characters",
