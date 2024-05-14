@@ -1,16 +1,20 @@
 require("dotenv").config();
 const express = require("express");
 const app = express();
+const passport = require("passport");
 
 // connect to database
 const connectDB = require("./db/connect");
-
 //routers
 const authenticationRouter = require("./routes/auth");
-
 //middleware
 const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
+
+//passport configuration
+require("./config/passport-jwt");
+
+app.use(passport.initialize());
 
 // parse incoming requests
 app.use(express.json());
