@@ -61,4 +61,8 @@ const login = async (req, res, next) => {
   }
 };
 
-module.exports = { register, login };
+const validate = (req, res) => {
+  res.status(StatusCodes.OK).json({ message: "Token valid" });
+};
+
+module.exports = { register, login, validate };
