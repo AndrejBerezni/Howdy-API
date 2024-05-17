@@ -61,8 +61,19 @@ const login = async (req, res, next) => {
   }
 };
 
+const discordLogin = (req, res) => {
+  const token = issueJWT(req.user.uid);
+
+  res.status(StatusCodes.OK).json({
+    user: {
+      ...req.user,
+    },
+    token,
+  });
+};
+
 const validate = (req, res) => {
   res.status(StatusCodes.OK).json({ message: "Token valid" });
 };
 
-module.exports = { register, login, validate };
+module.exports = { register, login, discordLogin, validate };

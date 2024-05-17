@@ -1,4 +1,4 @@
-const mongoosee = require("mongoose");
+const mongoose = require("mongoose");
 
 const DiscordUserSchema = new mongoose.Schema({
   discordId: {

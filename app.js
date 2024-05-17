@@ -41,6 +41,7 @@ app.use(express.urlencoded({ extended: true }));
 
 //passport configuration
 require("./config/passport-jwt");
+require("./config/passport-discord");
 
 app.use(passport.initialize());
 
