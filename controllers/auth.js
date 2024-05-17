@@ -64,14 +64,9 @@ const login = async (req, res, next) => {
 const discordLogin = (req, res) => {
   const token = issueJWT(req.user._id);
 
-  res.status(StatusCodes.OK).json({
-    user: {
-      uid: req.user._id,
-      nickname: req.user.nickname,
-      email: req.user.email,
-    },
-    token,
-  });
+  res.redirect(
+    `http://localhost:5173/oauth?token=${token.token}&uid=${req.user._id}&nickname=${req.user.nickname}&email=${req.user.email}`
+  );
 };
 
 const validate = (req, res) => {
