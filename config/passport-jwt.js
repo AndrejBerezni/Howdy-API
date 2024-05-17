@@ -1,7 +1,6 @@
 require("dotenv").config();
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
-const DiscordUser = require("../models/DiscordUser");
 const User = require("../models/User");
 const passport = require("passport");
 
@@ -15,11 +14,7 @@ module.exports = passport.use(
     try {
       const user = await User.findById(payload.uid);
       if (!user) {
-        const discordUser = await DiscordUser.findById(payload.uid);
-        if (!discordUser) {
-          return done(null, false);
-        }
-        return done(null, discordUser);
+        return done(null, false);
       }
       return done(null, user);
     } catch (err) {

@@ -5,7 +5,7 @@ const { issueJWT } = require("../utilities/tokenActions");
 
 const register = async (req, res, next) => {
   try {
-    const user = await User.create({ ...req.body });
+    const user = await User.create({ ...req.body, authMethod: "email" });
 
     const token = issueJWT(user._id);
 
@@ -62,11 +62,13 @@ const login = async (req, res, next) => {
 };
 
 const discordLogin = (req, res) => {
-  const token = issueJWT(req.user.uid);
+  const token = issueJWT(req.user._id);
 
   res.status(StatusCodes.OK).json({
     user: {
-      ...req.user,
+      uid: req.user._id,
+      nickname: req.user.nickname,
+      email: req.user.email,
     },
     token,
   });

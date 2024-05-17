@@ -1,6 +1,6 @@
 require("dotenv").config();
 const DiscordStrategy = require("passport-discord").Strategy;
-const DiscordUser = require("../models/DiscordUser");
+const User = require("../models/User");
 const passport = require("passport");
 
 module.exports = passport.use(
@@ -13,18 +13,22 @@ module.exports = passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        const user = await DiscordUser.findOne({ discordId: profile.id });
+        const user = await User.findOneAndUpdate(
+          { oAuthId: profile.id },
+          { nickname: profile.global_name, email: profile.email }
+        ); //adding update in case user changed display name or email on discord, so we can display them correctly
+
         if (!user) {
-          const newUser = await DiscordUser.create({ discordId: profile.id });
-          return done(null, {
-            uid: newUser._id,
+          const newUser = await User.create({
             nickname: profile.global_name,
+            email: profile.email,
+            authMethod: "discord",
+            oAuthId: profile.id,
           });
+          return done(null, newUser);
         }
-        return done(null, {
-          uid: user._id,
-          nickname: profile.global_name,
-        });
+
+        return done(null, user);
       } catch (err) {
         return done(err, false);
       }
