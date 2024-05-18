@@ -49,9 +49,16 @@ const UserSchema = new mongoose.Schema({
       "Password must contain at least one number, one special character, and have the length of at least 8 characters",
     ],
   },
+  profilePicture: String,
+  status: {
+    type: String,
+    required: true,
+    default: "offline",
+    enum: ["online", "offline", "busy"],
+  },
   authMethod: {
     type: String,
-    enum: ["email", "discord"],
+    enum: ["email", "discord", "google"],
     required: true,
     default: "email",
   },

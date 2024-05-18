@@ -61,7 +61,7 @@ const login = async (req, res, next) => {
   }
 };
 
-const discordLogin = (req, res) => {
+const oAuthLogin = (req, res) => {
   const token = issueJWT(req.user._id);
 
   res.redirect(
@@ -73,4 +73,4 @@ const validate = (req, res) => {
   res.status(StatusCodes.OK).json({ message: "Token valid" });
 };
 
-module.exports = { register, login, discordLogin, validate };
+module.exports = { register, login, oAuthLogin, validate };
