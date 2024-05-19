@@ -7,11 +7,13 @@ const UserSchema = new mongoose.Schema({
     minlength: [2, "First name must be longer than 2 characters"],
     maxlength: [50, "First name can not be longer than 50 characters"],
   },
+
   lastName: {
     type: String,
     minlength: [2, "Last name must be longer than 2 characters"],
     maxlength: [50, "Last name can not be longer than 50 characters"],
   },
+
   nickname: {
     type: String,
     required: [true, "Please provide nickname"],
@@ -19,6 +21,7 @@ const UserSchema = new mongoose.Schema({
     maxlength: [64, "Nickname can not be longer than 64 characters"],
     unique: [true, "Nickname already exists, please choose another one"],
   },
+
   email: {
     type: String,
     required: ["true", "Please provide email"],
@@ -28,6 +31,7 @@ const UserSchema = new mongoose.Schema({
     ],
     unique: [true, "Email already registered"],
   },
+
   password: {
     type: String,
     validate: {
@@ -49,32 +53,42 @@ const UserSchema = new mongoose.Schema({
       "Password must contain at least one number, one special character, and have the length of at least 8 characters",
     ],
   },
+
   profilePicture: String,
+
   status: {
     type: String,
     required: true,
     default: "offline",
     enum: ["online", "offline", "busy"],
   },
+
   authMethod: {
     type: String,
     enum: ["email", "discord", "google"],
     required: true,
     default: "email",
   },
+
   oAuthId: {
     type: {},
   },
+
   friends: {
     type: [mongoose.Schema.Types.ObjectId],
+    ref: "User",
     default: [],
   },
+
   chats: {
     type: [mongoose.Schema.Types.ObjectId],
+    ref: "Chat",
     default: [],
   },
+
   friendRequests: {
     type: [mongoose.Schema.Types.ObjectId],
+    ref: "FriendRequest",
     default: [],
   },
 });
