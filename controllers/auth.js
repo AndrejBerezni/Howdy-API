@@ -33,6 +33,7 @@ const login = async (req, res, next) => {
     }
 
     const user = await User.findOne({
+      authMethod: "email",
       $or: [{ email: login }, { nickname: login }],
     });
     if (!user) {

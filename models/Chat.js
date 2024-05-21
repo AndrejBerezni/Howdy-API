@@ -13,7 +13,7 @@ const ChatSchema = new mongoose.Schema({
     ref: "Message",
   },
 
-  //to add files when we implement file sharing
+  //to add files when I implement file sharing
 });
 
 const Chat = mongoose.model("Chat", ChatSchema);

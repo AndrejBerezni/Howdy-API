@@ -11,6 +11,7 @@ const connectDB = require("./db/connect");
 
 //routers
 const authenticationRouter = require("./routes/auth");
+const usersRouter = require("./routes/users");
 
 //middleware
 const notFoundMiddleware = require("./middleware/not-found");
@@ -48,6 +49,7 @@ app.use(passport.initialize());
 
 //routes
 app.use("/api/v1/auth", authenticationRouter);
+app.use("/api/v1/users", usersRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);

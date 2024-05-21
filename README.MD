@@ -1,3 +1,5 @@
+🚧🛠️ Work in progress 🛠️🚧
+
 # Howdy!
 
 ## Real-time chat application built with MERN stack
