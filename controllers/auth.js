@@ -10,13 +10,7 @@ const register = async (req, res, next) => {
     const token = issueJWT(user._id);
 
     res.status(StatusCodes.CREATED).json({
-      user: {
-        uid: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        nickname: user.nickname,
-        email: user.email,
-      },
+      user: user._id,
       token,
     });
   } catch (err) {
@@ -48,13 +42,7 @@ const login = async (req, res, next) => {
     const token = issueJWT(user._id);
 
     res.json({
-      user: {
-        uid: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        nickname: user.nickname,
-        email: user.email,
-      },
+      user: user._id,
       token,
     });
   } catch (err) {
@@ -66,7 +54,7 @@ const oAuthLogin = (req, res) => {
   const token = issueJWT(req.user._id);
 
   res.redirect(
-    `http://localhost:5173/oauth?token=${token.token}&uid=${req.user._id}&nickname=${req.user.nickname}&email=${req.user.email}`
+    `http://localhost:5173/oauth?token=${token.token}&_id=${req.user._id}`
   );
 };
 

@@ -1,8 +1,8 @@
 const User = require("../models/User");
 const { StatusCodes } = require("http-status-codes");
-const { BadRequestError } = require("../errors");
+const { BadRequestError, NotFoundError } = require("../errors");
 
-const getUsers = async (req, res, next) => {
+const searchUsers = async (req, res, next) => {
   try {
     const { query } = req.query;
 
@@ -40,4 +40,32 @@ const getUsers = async (req, res, next) => {
   }
 };
 
-module.exports = { getUsers };
+const getUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findOne({ _id: id });
+
+    if (!user) {
+      throw new NotFoundError(`User with id: ${id} does not exist.`);
+    }
+
+    res.status(StatusCodes.OK).json({
+      user: {
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        nickname: user.nickname,
+        email: user.email,
+        profilePicture: user.profilePicture,
+        status: user.status,
+      },
+      friends: user.friends,
+      friendRequests: user.friendRequests,
+      chats: user.chats,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { searchUsers, getUser };
