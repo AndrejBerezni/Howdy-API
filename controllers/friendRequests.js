@@ -1,7 +1,7 @@
 const FriendRequest = require("../models/FriendRequest");
 const User = require("../models/User");
 const { StatusCodes } = require("http-status-codes");
-const { BadRequestError, NotFoundError } = require("../errors");
+const { BadRequestError, NotFoundError, CustomAPIError } = require("../errors");
 const mongoose = require("mongoose");
 
 const createFriendRequest = async (req, res, next) => {
@@ -95,7 +95,7 @@ const respondToFriendRequest = async (req, res, next) => {
     }
 
     switch (accepted) {
-      case "yes":
+      case "yes": //update request status to 'accepted', remove request from User documents, and add users to each other as friends
         const acceptedRequest = await FriendRequest.findByIdAndUpdate(
           requestID,
           { status: "accepted" }
@@ -118,7 +118,7 @@ const respondToFriendRequest = async (req, res, next) => {
           message: `Users with ids ${acceptSender._id} and ${acceptRecipient._id} are now friends`,
         });
         break;
-      case "no":
+      case "no": // update request status to 'declined' and remove request from User documents
         const declinedRequest = await FriendRequest.findByIdAndUpdate(
           requestID,
           { status: "declined" }
@@ -149,4 +149,45 @@ const respondToFriendRequest = async (req, res, next) => {
   }
 };
 
-module.exports = { createFriendRequest, respondToFriendRequest };
+const withdrawFriendRequest = async (req, res, next) => {
+  try {
+    const { requestID } = req.body;
+
+    if (!requestID || !mongoose.Types.ObjectId.isValid(requestID)) {
+      throw new BadRequestError("Please provide valid friend request id");
+    }
+
+    const friendRequest = await FriendRequest.findById(requestID);
+
+    if (!friendRequest || friendRequest.status !== "pending") {
+      throw new NotFoundError(`Friend request with id: ${requestID} not found`);
+    }
+
+    await User.findByIdAndUpdate(friendRequest.sender, {
+      $pull: { "friendRequests.sent": { _id: requestID } },
+    });
+    await User.findByIdAndUpdate(friendRequest.recipient, {
+      $pull: { "friendRequests.received": { _id: requestID } },
+    });
+
+    const deletedRequest = await FriendRequest.deleteOne({ _id: requestID });
+    if (deletedRequest.deletedCount === 0) {
+      throw new CustomAPIErrorError(
+        `Unable to withdraw friend request with id: ${requestID} - Please try again later`,
+        StatusCodes.INTERNAL_SERVER_ERROR
+      );
+    }
+
+    res
+      .status(StatusCodes.OK)
+      .json({ message: `Successfully withdrawn request with id:${requestID}` });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = {
+  createFriendRequest,
+  respondToFriendRequest,
+  withdrawFriendRequest,
+};
