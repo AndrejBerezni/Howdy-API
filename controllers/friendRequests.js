@@ -59,10 +59,16 @@ const createFriendRequest = async (req, res, next) => {
     });
 
     // modifying retrieved objects and saving them, instead of performing findByIdAndUpdate, since I trust it would be more performant
-    senderUser.friendRequests.sent.push(newFriendRequest._id);
+    senderUser.friendRequests.sent.push({
+      _id: newFriendRequest._id,
+      recipient,
+    });
     await senderUser.save();
 
-    recipientUser.friendRequests.received.push(newFriendRequest._id);
+    recipientUser.friendRequests.received.push({
+      _id: newFriendRequest._id,
+      sender,
+    });
     await recipientUser.save();
 
     res.status(StatusCodes.CREATED).json({
@@ -74,4 +80,73 @@ const createFriendRequest = async (req, res, next) => {
   }
 };
 
-module.exports = { createFriendRequest };
+const respondToFriendRequest = async (req, res, next) => {
+  try {
+    const { requestID, accepted } = req.body;
+
+    //accepted should be 'yes' or 'no' - I did not want to use boolean, since some of the validation,
+    // (like the one on the next line), would require additional logic if accepted === false
+    if (
+      !requestID ||
+      !accepted ||
+      !mongoose.Types.ObjectId.isValid(requestID)
+    ) {
+      throw new BadRequestError("Missing details to respond to friend request");
+    }
+
+    switch (accepted) {
+      case "yes":
+        const acceptedRequest = await FriendRequest.findByIdAndUpdate(
+          requestID,
+          { status: "accepted" }
+        );
+        const acceptSender = await User.findByIdAndUpdate(
+          acceptedRequest.sender,
+          {
+            $pull: { "friendRequests.sent": { _id: requestID } },
+            $push: { friends: acceptedRequest.recipient },
+          }
+        );
+        const acceptRecipient = await User.findByIdAndUpdate(
+          acceptedRequest.recipient,
+          {
+            $pull: { "friendRequests.received": { _id: requestID } },
+            $push: { friends: acceptedRequest.sender },
+          }
+        );
+        res.status(StatusCodes.OK).json({
+          message: `Users with ids ${acceptSender._id} and ${acceptRecipient._id} are now friends`,
+        });
+        break;
+      case "no":
+        const declinedRequest = await FriendRequest.findByIdAndUpdate(
+          requestID,
+          { status: "declined" }
+        );
+        const declinedSender = await User.findByIdAndUpdate(
+          declinedRequest.sender,
+          {
+            $pull: { "friendRequests.sent": { _id: requestID } },
+          }
+        );
+        const declinedRecipient = await User.findByIdAndUpdate(
+          declinedRequest.recipient,
+          {
+            $pull: { "friendRequests.received": { _id: requestID } },
+          }
+        );
+        res.status(StatusCodes.OK).json({
+          message: `User with id: ${declinedRecipient._id}, declined friend request from user with id: ${declinedSender._id}`,
+        });
+        break;
+      default:
+        throw new BadRequestError(
+          "Incorrect information about acceptance of request provided - please answer with 'yes' or 'no' "
+        );
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { createFriendRequest, respondToFriendRequest };

@@ -51,7 +51,7 @@ app.use(passport.initialize());
 //routes
 app.use("/api/v1/auth", authenticationRouter);
 app.use("/api/v1/users", usersRouter);
-app.use("/api/v1/friend", friendRequestsRouter);
+app.use("/api/v1/friendrequest", friendRequestsRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
