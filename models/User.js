@@ -87,9 +87,16 @@ const UserSchema = new mongoose.Schema({
   },
 
   friendRequests: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: "FriendRequest",
-    default: [],
+    sent: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "FriendRequest",
+      default: [],
+    },
+    received: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "FriendRequest",
+      default: [],
+    },
   },
 });
 
