@@ -41,7 +41,7 @@ const login = async (req, res, next) => {
 
     const token = issueJWT(user._id);
 
-    res.json({
+    res.status(StatusCodes.OK).json({
       user: user._id,
       token,
     });
