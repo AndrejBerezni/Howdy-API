@@ -49,6 +49,10 @@ const getUser = async (req, res, next) => {
       throw new NotFoundError(`User with id: ${id} does not exist.`);
     }
 
+    const friends = await User.find({ _id: { $in: user.friends } }).select(
+      "nickname email profilePicture firstName lastName status"
+    );
+
     res.status(StatusCodes.OK).json({
       user: {
         _id: user._id,
@@ -59,7 +63,7 @@ const getUser = async (req, res, next) => {
         profilePicture: user.profilePicture,
         status: user.status,
       },
-      friends: user.friends,
+      friends,
       friendRequests: user.friendRequests,
       chats: user.chats,
     });
